@@ -11,6 +11,12 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.static("public"));
-app.use(cookieParser())
+app.use(cookieParser());
+
+// Import routes
+import userRoutes from "./routes/user.routes.js"
+
+// Routes Declaration
+app.use("/api/v1/users", userRoutes);
 
 export {app};

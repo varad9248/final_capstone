@@ -35,7 +35,8 @@ const userSchema = new Schema(
         searchHistory: [
             {
                 type: Schema.Types.ObjectId,
-                ref: "SearchProduct"
+                ref: "SearchProduct",
+                required : false
             }
         ],
         password: {

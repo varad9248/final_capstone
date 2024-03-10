@@ -234,8 +234,6 @@ const refreshAccessToken = AsyncHandler(async (req, res) => {
 const changeCurrentPassword = AsyncHandler(async(req, res) => {
     const {oldPassword, newPassword} = req.body
 
-    
-
     const user = await User.findById(req.user?._id)
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
@@ -435,10 +433,10 @@ const getSearchHistory = AsyncHandler(async(req, res) => {
         },
         {
             $lookup: {
-                from: "videos",
-                localField: "watchHistory",
+                from: "products",
+                localField: "searchHistory",
                 foreignField: "_id",
-                as: "watchHistory",
+                as: "searchHistory",
                 pipeline: [
                     {
                         $lookup: {
@@ -475,7 +473,7 @@ const getSearchHistory = AsyncHandler(async(req, res) => {
         new ApiResponse(
             200,
             user[0].watchHistory,
-            "Watch history fetched successfully"
+            "search history fetched successfully"
         )
     )
 })

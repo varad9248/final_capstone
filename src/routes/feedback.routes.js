@@ -5,8 +5,8 @@ const router = Router()
 
 router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
-router.route("/").post(createfeedback);
-router.route("/user/:userId").get(getUserfeedback);
-router.route("/:tweetId").patch(updatefeedback).delete(deletefeedback);
+router.route("/").post(createFeedback);
+router.route("/user/:userId").get(getUserFeedback);
+router.route("/:feedbackId").patch(updateFeedback).delete(deleteFeedback);
 
-export default router
+export default router;

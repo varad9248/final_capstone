@@ -441,7 +441,7 @@ const getSearchHistory = AsyncHandler(async(req, res) => {
     .json(
         new ApiResponse(
             200,
-            user[0].watchHistory,
+            user[0].SearchHistory,
             "search history fetched successfully"
         )
     )

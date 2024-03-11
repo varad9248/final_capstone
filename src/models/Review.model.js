@@ -30,4 +30,6 @@ const reviewSchema = new Schema(
     }
 );
 
+productSchema.plugin(mongooseAggregatePaginate);
+
 export const Review = mongoose.model("Review", reviewSchema);

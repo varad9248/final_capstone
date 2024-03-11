@@ -24,4 +24,6 @@ const searchproductSchema = new Schema(
     }
 );
 
+productSchema.plugin(mongooseAggregatePaginate);
+
 export const SearchProduct = mongoose.model("searchproduct", searchproductSchema);

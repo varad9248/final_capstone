@@ -6,7 +6,7 @@ const searchproductSchema = new Schema(
             type : String,
             required : true,
         },
-        products : {
+        scrapedProducts : {
             type : Schema.Types.ObjectId,
             ref : "Product"
         },
@@ -24,4 +24,4 @@ const searchproductSchema = new Schema(
     }
 );
 
-export const SearchProduct = mongoose.model("SearchProduct", searchproductSchema);
+export const SearchProduct = mongoose.model("searchproduct", searchproductSchema);

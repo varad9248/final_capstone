@@ -16,9 +16,9 @@ app.use(cookieParser());
 // Import routes
 import userRoutes from "./routes/user.routes.js"
 import productRoutes from "./routes/product.routes.js"
-import searchproductRoutes from "./routes/product.routes.js"
-import reviewRoutes from "./routes/product.routes.js"
-import feedbackRoutes from "./routes/product.routes.js"
+import searchproductRoutes from "./routes/searchproduct.routes.js"
+import reviewRoutes from "./routes/review.routes.js"
+import feedbackRoutes from "./routes/feedback.routes.js"
 
 
 // Routes Declaration

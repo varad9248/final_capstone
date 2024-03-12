@@ -1,4 +1,6 @@
 import mongoose, {Schema} from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2"
+
 
 const searchproductSchema = new Schema(
     {
@@ -6,10 +8,12 @@ const searchproductSchema = new Schema(
             type : String,
             required : true,
         },
-        scrapedProducts : {
-            type : Schema.Types.ObjectId,
-            ref : "Product"
-        },
+        scrapedProducts :[ 
+            {
+                type : Schema.Types.ObjectId,
+                ref : "Product"
+            }
+        ],
         productCount : {
             type : Number,
             required : true,
@@ -24,6 +28,6 @@ const searchproductSchema = new Schema(
     }
 );
 
-productSchema.plugin(mongooseAggregatePaginate);
+searchproductSchema.plugin(mongooseAggregatePaginate);
 
 export const SearchProduct = mongoose.model("searchproduct", searchproductSchema);

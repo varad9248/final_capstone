@@ -428,7 +428,7 @@ const getSearchHistory = AsyncHandler(async(req, res) => {
                             from: "products",
                             localField: "scrapedProducts",
                             foreignField: "_id",
-                            as: "scrapedProducts",
+                            as: "scrapedProducts"
                         }
                     }
                 ]

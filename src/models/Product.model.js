@@ -81,7 +81,7 @@ const productSchema = new Schema(
             required : false,
             default : 4.0
         },
-        reviews :[ 
+        product_reviews :[ 
             {
                 type : Schema.Types.ObjectId ,
                 required : false ,

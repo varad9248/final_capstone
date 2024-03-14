@@ -1,7 +1,6 @@
 import { AsyncHandler } from "../utils/AsyncHandler.js";
 import {ApiError} from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponce.js";
-import { Product } from "../models/Product.model.js";
 import { SearchProduct } from "../models/SearchProduct.model.js";
 import { User } from "../models/user.model.js";
 
@@ -9,7 +8,7 @@ const createSearchHistory = AsyncHandler( async (req , res)=>{
 
     try {
 
-        const  userId  = req.userData.userId;
+        const  userId  = req.user._id;
 
         const { prompt , scrapedProducts , productCount , searchResult }  = req.body ;
 
@@ -22,6 +21,16 @@ const createSearchHistory = AsyncHandler( async (req , res)=>{
             productCount , 
             searchResult
         });
+
+        await User.findByIdAndUpdate(
+            userId,
+            {
+                $addToSet: {
+                    searchHistory : history._id
+                }
+            },
+            {new : true}
+        );
 
         scrapedProducts.some(async (product) => { 
             await SearchProduct.findByIdAndUpdate(

@@ -82,14 +82,14 @@ export default async function scrapeAmazonProduct(url, productName) {
       const review_sentiment = ( review_rating  >= 4 ) ? "positive" : (review_rating == 3)  ? "neutral" : "negative";
   
       const newReview = await Review.create({
-        review_author : review_author ,
+        review_author : review_author,
         review_title : review_title,
         review_desc : review_desc,
         review_rating : review_rating,
         review_sentiment : review_sentiment
       });
 
-      reviews_data.push(newReview._id);
+      reviews_data.push(newReview);
     })
 
     // Construct data object with scraped information
@@ -110,7 +110,7 @@ export default async function scrapeAmazonProduct(url, productName) {
       lowestPrice: Number(currentPrice) || Number(originalPrice),
       highestPrice: Number(originalPrice) || Number(currentPrice),
       averagePrice: Number(currentPrice) || Number(originalPrice),
-      reviews : reviews_data,
+      product_reviews : reviews_data,
       domain: "Amazon",
       searchId: productName,
     };

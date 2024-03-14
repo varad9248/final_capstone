@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import extractPrice  from '../utils.js';
+import { Review } from '../../../models/Review.model.js';
 
 export default async function scrapeFlipkartProduct(url, searchId) {
   if (!url) return;
@@ -62,33 +63,37 @@ export default async function scrapeFlipkartProduct(url, searchId) {
 
     const category = category_words[category_words.length - 1];
 
-    const reviews_element = $('#cm-cr-dp-review-list div.a-section.celwidget');
+    const reviews_element = $('div._2wzgFH');
 
-    let reviews_data = [];
-    
-    reviews_element.each(async (index , element) => {
-      const $ = cheerio.load(element);
-      // Extract reviewer name
-      const review_author = $('a.a-profile span.a-profile-name').text().trim().replace(/\n/g,"");
-  
-      const review_title = $('[data-hook="review-title"]').text().trim().replace(/\n/g,"");
-  
-      const review_desc = $('[data-hook="review-body"]').text().trim().replace(/\n/g,"");
-  
-      const review_rating =Number( $('[data-hook="review-star-rating"] .a-icon-alt').text().trim().replace(" out of 5 stars",""));
+let reviews_data = [];
 
-      const review_sentiment = ( review_rating  >= 4 ) ? "positive" : (review_rating == 3)  ? "neutral" : "negative";
-  
-      const newReview = await Review.create({
-        review_author : review_author ,
-        review_title : review_title,
-        review_desc : review_desc,
-        review_rating : review_rating,
-        review_sentiment : review_sentiment
-      });
+for (let i = 0; i < 3; i++) {
+    const element = reviews_element[i];
+    if(!element) continue; // eslint
+    const $ = cheerio.load(element);
 
-      reviews_data.push(newReview._id);
+    // Extract reviewer name
+    const review_author = $('p._2sc7ZR._2V5EHH').text().trim().replace(/\n/g,"");
+
+    const review_title = $('p._2-N8zT').text().trim().replace(/\n/g,"");
+
+    const review_desc = $('div.t-ZTKy').text().trim().replace(/\n/g,"").replace("READ MORE","");
+
+    const review_rating = Number($('div._3LWZlK._1BLPMq').text().trim().replace(" out of 5 stars",""));
+
+    const review_sentiment = (review_rating >= 4) ? "positive" : (review_rating == 3) ? "neutral" : "negative";
+
+    const newReview = await Review.create({
+      review_author : review_author,
+      review_title : review_title,
+      review_desc : review_desc,
+      review_rating : review_rating,
+      review_sentiment : review_sentiment
     })
+
+    reviews_data.push(newReview._id);
+    
+  }
 
 
     // Construct data object with scraped information
@@ -108,7 +113,7 @@ export default async function scrapeFlipkartProduct(url, searchId) {
       avgStars: Number(starsCount),
       isOutOfStock: outOfStock,
       description,
-      reviews : reviews_data,
+      product_reviews : reviews_data ,
       domain: "Flipkart",
       searchId: searchId,
       lowestPrice: Number(currentPrice) || Number(originalPrice),
@@ -116,7 +121,6 @@ export default async function scrapeFlipkartProduct(url, searchId) {
       averagePrice: Number(currentPrice) || Number(originalPrice),
     };
 
-    console.log(data);
     return data;
   } catch (error) {
     console.log(error);

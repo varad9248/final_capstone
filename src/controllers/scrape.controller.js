@@ -5,9 +5,10 @@ import { scrapeAmazonPage } from "../lib/scraper/amazon/pageamazon.js";
 import { scrapeFlipkartPage } from "../lib/scraper/flipkart/pageflipkart.js";
 import { SearchProduct } from "../models/SearchProduct.model.js";
 import { User } from "../models/user.model.js";
+import { Product } from "../models/Product.model.js";
 
 
-const scrapeAmazon = AsyncHandler(async (req,res) =>{
+const scrapeProducts = AsyncHandler(async (req,res) =>{
 
     try {
 
@@ -34,10 +35,10 @@ const scrapeAmazon = AsyncHandler(async (req,res) =>{
         )
 
         const  amazon_products  = await scrapeAmazonPage(productName , newSearch._id);
+        const  flipkart_products  = await scrapeFlipkartPage(productName , newSearch._id);
 
-        console.log(amazon_products);
 
-        if(amazon_products) {
+        if(amazon_products || flipkart_products) {
             suucess = true
         }
 
@@ -47,10 +48,7 @@ const scrapeAmazon = AsyncHandler(async (req,res) =>{
         .json(
             new ApiResponse(
                 200, 
-                {
-                    newSearch
-                },
-                "Amazon scraped Successfully"
+                "products scraped Successfully"
             )
         )
     } catch (error) {
@@ -59,62 +57,31 @@ const scrapeAmazon = AsyncHandler(async (req,res) =>{
 
 });
 
-const scrapeFlipkart = AsyncHandler( async (req , res)=>{
-
-    try {
-    
-        const { productName } = req.body;
-        console.log(productName);
-        let suucess = false;
-
-        if( !productName ) return new ApiError("400" , "Product name is not defined..!");
-
-
-        const newSearch = await SearchProduct.create({
-            prompt : productName , 
-            productCount : 3 , 
-            searchResult : suucess
-        })
-
-        await User.findByIdAndUpdate(
-            req.user._id,
-            {
-                $addToSet : {
-                    searchHistory:newSearch._id
-                }
-            }
-        )
-
-        const  amazon_products  = await scrapeFlipkartPage(productName , newSearch._id);
-
-        console.log(amazon_products);
-
-        if(amazon_products) {
-            suucess = true
-        }
-
-        
-        return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200, 
-                {
-                    newSearch
-                },
-                "Amazon scraped Successfully"
-            )
-        )
-    } catch (error) {
-        console.log(error);
-    }
-
-});
 
 const getCategioryProducts = AsyncHandler( async (req , res)=>{
 
     try {
+
+        const { categiory } = req.body;
         
+        if( ! categiory) return new ApiError("400" , "Categiory is not defined");
+
+        const categioryProducts = await Product.aggregate([
+            {
+                $match : {
+                    category : categiory
+                }
+            },
+            {
+                $project : {
+                    _id : 1,
+                    title : 1,
+                    category : 1,
+                    currentPrice : 1,
+                    image : 1
+                }
+            }
+        ]) 
     
         return res
         .status(200)
@@ -122,9 +89,9 @@ const getCategioryProducts = AsyncHandler( async (req , res)=>{
             new ApiResponse(
                 200, 
                 {
-                    feedback
+                    categioryProducts
                 },
-                "feedback updated Successfully"
+                "products accessed successfully Successfully"
             )
         )
     } catch (error) {
@@ -143,7 +110,7 @@ const trackproduct = AsyncHandler( async (req , res)=>{
         .json(
             new ApiResponse(
                 200, 
-                "feedback deleted Successfully"
+                "product added to tracking Successfully"
             )
         )
     } catch (error) {
@@ -153,8 +120,7 @@ const trackproduct = AsyncHandler( async (req , res)=>{
 });
 
 export {
-    scrapeAmazon,
-    scrapeFlipkart,
+    scrapeProducts,
     getCategioryProducts,
     trackproduct
 }

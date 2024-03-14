@@ -4,6 +4,7 @@ import  scrapeFlipkartProduct  from './flipkart.js';
 import { Product } from "../../../models/Product.model.js";
 import { SearchProduct } from '../../../models/SearchProduct.model.js';
 import { getAveragePrice, getHighestPrice, getLowestPrice } from '../utils.js';
+import mongoose from 'mongoose';
 
 
 export async function scrapeFlipkartPage(ProductName , searchId ) {
@@ -36,6 +37,7 @@ export async function scrapeFlipkartPage(ProductName , searchId ) {
           const url = createUrlFlipkart(ProductName);
           const response = await axios({
             headers: {
+              ...CUSTOM_HEADERS,
                 "Content-Type": "application/json",
                 "Cache-Control": "no-cache",
             },
@@ -69,7 +71,6 @@ export async function scrapeFlipkartPage(ProductName , searchId ) {
               if (href) {
                 if(count >=3 ) return;
                   const page_url = urljoin(url, href);
-                  console.log(page_url);
                   urls.push(page_url);
               }
               count++;
@@ -120,21 +121,21 @@ export async function scrapeFlipkartPage(ProductName , searchId ) {
                 }
               }
             )
-            for ( const review of prod.reviews ){
-              await Product.findByIdAndUpdate(
-                product?._id,
-                {
-                  $addToSet: { 
-                    reviews:review 
-                  }
-                },
-                {new : true}
-              )
-            }
+
+            await Product.findByIdAndUpdate(
+              newProduct._id ,
+              {
+                $addToSet : {
+                  product_reviews : product.product_reviews
+                }
+              }
+            )
+        
             products.push(product);
             continue;
           }
           const newProduct = await Product.create(product);
+
           await SearchProduct.findByIdAndUpdate(
             searchId,
             {
@@ -143,6 +144,17 @@ export async function scrapeFlipkartPage(ProductName , searchId ) {
               }
             }
           )
+          products.push(newProduct);
+
+          await Product.findByIdAndUpdate(
+            newProduct._id ,
+            {
+              $addToSet : {
+                product_reviews : product.product_reviews
+              }
+            }
+          )
+
           products.push(newProduct);
     
           }

@@ -39,7 +39,6 @@ export async function scrapeAmazonPage(ProductName , searchId) {
       if (href) {
         if(count >= 3) return;
         const page_url = urljoin(url, href);
-        console.log(page_url);
         urls.push(page_url);
       }
       count++;
@@ -92,17 +91,14 @@ export async function scrapeAmazonPage(ProductName , searchId) {
           }
         )
 
-        for ( const review of prod.reviews ){
-          await Product.findByIdAndUpdate(
-            product?._id,
-            {
-              $addToSet: { 
-                reviews:review 
-              }
-            },
-            {new : true}
-          )
-        }
+        await Product.findByIdAndUpdate(
+          newProduct._id ,
+          {
+            $addToSet : {
+              product_reviews : product.product_reviews
+            }
+          }
+        )
 
         products.push(product);
         continue;
@@ -115,6 +111,15 @@ export async function scrapeAmazonPage(ProductName , searchId) {
         {
           $addToSet : {
             scrapedProducts : newProduct?._id 
+          }
+        }
+      )
+
+      await Product.findByIdAndUpdate(
+        newProduct._id ,
+        {
+          $addToSet : {
+            product_reviews : product.product_reviews
           }
         }
       )
